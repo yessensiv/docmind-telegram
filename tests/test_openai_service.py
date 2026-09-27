@@ -70,6 +70,19 @@ def test_api_error_becomes_safe_message_without_secret():
     assert "secret" not in result.text
 
 
+def test_production_document_prompt_uses_input_token_limit_not_message_limit():
+    responses = FakeResponses("document answer")
+    config = production_config(MAX_MESSAGE_LENGTH="100", MAX_INPUT_TOKENS="4000")
+    service = OpenAIService(config, client=FakeClient(responses))
+    prompt = "Документ: " + ("текст " * 4000)
+
+    result = service.complete("user-1", prompt, TaskKind.DOCUMENTATION)
+
+    assert result.text == "document answer"
+    assert len(responses.calls) == 1
+    assert len(responses.calls[0]["input"]) == 16000
+
+
 def test_production_requires_key(monkeypatch):
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
     with pytest.raises(ConfigError):

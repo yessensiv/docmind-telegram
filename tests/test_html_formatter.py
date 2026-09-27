@@ -3,7 +3,7 @@ from telegram_ai_assistant.html_formatter import format_html, split_html
 
 def test_format_html_escapes_dynamic_text_and_formats_blocks():
     formatted = format_html("КРАТКОЕ РЕЗЮМЕ:\n<b>bold</b> <i>italic</i> <code>code</code> & текст\n/ask вопрос")
-    assert "<b>КРАТКОЕ РЕЗЮМЕ:</b>" in formatted
+    assert "📝 <b>РЕЗЮМЕ</b>" in formatted
     assert "<b>bold</b>" in formatted
     assert "<i>italic</i>" in formatted
     assert "<code>code</code>" in formatted

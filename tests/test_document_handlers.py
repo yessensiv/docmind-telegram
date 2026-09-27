@@ -61,11 +61,12 @@ def test_document_handler_returns_demo_summary():
     handlers = TelegramHandlers(AssistantHandlers(load_config({"DEMO_MODE": "true"}, dotenv_path=None)))
     run(handlers.document(update, context))
     response = update.message.replies[0][0]
-    assert "📝 <b>КРАТКОЕ РЕЗЮМЕ:</b>" in response
-    assert "🔹 <b>КЛЮЧЕВЫЕ ПУНКТЫ:</b>" in response
-    assert "📌 <b>СТАТУС:</b>" in response
-    assert "📄 Размер документа: 10 байт" in response
-    assert "🔤 Символов: 10" in response
+    assert "📝 <b>РЕЗЮМЕ</b>" in response
+    assert "🔹 <b>ГЛАВНОЕ</b>" in response
+    assert "📌 <b>СТАТУС</b>" in response
+    assert "📄 <b>ИНФОРМАЦИЯ О ФАЙЛЕ</b>" in response
+    assert "Размер: 10 байт" in response
+    assert "Символов: 10" in response
 
 
 def test_document_handler_rejects_pdf_without_download():

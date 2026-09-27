@@ -47,8 +47,6 @@ class OpenAIService:
             raise ConfigError("OpenAIService is disabled in DEMO_MODE=true")
         decision = choose_model(kind)
         estimate = self._estimate(decision.model, prompt)
-        if len(prompt) > self.config.max_message_length:
-            return ServiceResult("Сообщение слишком длинное.", decision.model, estimate)
         if estimate.estimated_usd >= self.config.require_confirmation_above_usd:
             if not confirmed or not self.confirmations.consume(user_id, prompt, decision.model):
                 self.confirmations.issue(user_id, prompt, decision.model)
@@ -58,9 +56,10 @@ class OpenAIService:
         except BudgetExceededError:
             return ServiceResult("Лимит расходов исчерпан. Попробуйте позже.", decision.model, estimate)
         try:
+            input_limit = max(1, self.config.max_input_tokens * 4)
             response = self.client.responses.create(
                 model=decision.model.value,
-                input=prompt[: self.config.max_message_length],
+                input=prompt[:input_limit],
                 max_output_tokens=self.config.max_output_tokens,
             )
             text = str(getattr(response, "output_text", "")).strip()

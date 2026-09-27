@@ -22,14 +22,15 @@ def format_html(text: str) -> str:
         line = re.sub(r"`([^`\n]+)`", r"<code>\1</code>", line)
         line = re.sub(r"\*\*([^*\n]+)\*\*", r"<b>\1</b>", line)
         line = re.sub(r"(?<!\*)\*([^*\n]+)\*(?!\*)", r"<i>\1</i>", line)
-        for heading, emoji in (
-            ("КРАТКОЕ РЕЗЮМЕ:", "📝"),
-            ("КЛЮЧЕВЫЕ ПУНКТЫ:", "🔹"),
-            ("СТАТУС:", "📌"),
-            ("ПО ДОКУМЕНТУ МОЖНО СПРОСИТЬ:", "💡"),
+        for heading, label, emoji in (
+            ("КРАТКОЕ РЕЗЮМЕ:", "РЕЗЮМЕ", "📝"),
+            ("КЛЮЧЕВЫЕ ПУНКТЫ:", "ГЛАВНОЕ", "🔹"),
+            ("СТАТУС:", "СТАТУС", "📌"),
+            ("ПО ДОКУМЕНТУ МОЖНО СПРОСИТЬ:", "ПО ДОКУМЕНТУ МОЖНО СПРОСИТЬ", "💡"),
+            ("📄 ИНФОРМАЦИЯ О ФАЙЛЕ:", "ИНФОРМАЦИЯ О ФАЙЛЕ", "📄"),
         ):
             if line == heading:
-                line = f"{emoji} <b>{heading}</b>"
+                line = f"{emoji} <b>{label}</b>"
                 break
         if line.endswith(":") and not line.startswith(("•", "-", "*")):
             line = f"<b>{line}</b>"

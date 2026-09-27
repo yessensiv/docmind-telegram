@@ -98,8 +98,9 @@ class TelegramHandlers:
             questions = generate_questions(text)
             response = (
                 f"{response}\n\n"
-                f"📄 Размер документа: {len(content)} байт\n"
-                f"🔤 Символов: {len(text)}"
+                f"📄 ИНФОРМАЦИЯ О ФАЙЛЕ:\n"
+                f"Размер: {len(content)} байт\n"
+                f"Символов: {len(text)}"
             )
         except DocumentError as exc:
             await self._reply(update, str(exc))
