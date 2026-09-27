@@ -55,7 +55,7 @@ def test_ask_integration_sends_bounded_context_and_question():
     handlers = TelegramHandlers(None, ai_service=service, document_store=store)
     update = Update("/ask What is here?")
     asyncio.run(handlers.ask(update, None))
-    assert any("⏳ Анализирую документ…" in text for text in update.message.replies)
+    assert any("⏳ Ищу ответ в документе…" in text for text in update.message.replies)
     assert "mock document answer" in update.message.replies
     assert update.message.sent_messages[0].deleted is True
     prompt = client.responses.calls[0]["input"]

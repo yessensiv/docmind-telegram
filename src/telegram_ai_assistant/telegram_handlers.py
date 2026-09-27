@@ -56,7 +56,7 @@ class TelegramHandlers:
             if self.ai_service is None:
                 response = demo_reply(prompt).text
             else:
-                progress = await self._progress(update)
+                progress = await self._progress(update, "⏳ Обрабатываю запрос…")
                 response = self.ai_service.complete(self._user_id(update), prompt, TaskKind.CHAT).text
         except MessageTooLongError:
             await self._reply(update, "Сообщение слишком длинное. Сократите его и попробуйте снова.")
@@ -84,7 +84,7 @@ class TelegramHandlers:
         progress = None
         try:
             if self.ai_service is not None:
-                progress = await self._progress(update)
+                progress = await self._progress(update, "⏳ Анализирую документ…")
             telegram_file = await context.bot.get_file(document.file_id)
             content = bytes(await telegram_file.download_as_bytearray())
             if self.ai_service is None:
@@ -119,7 +119,7 @@ class TelegramHandlers:
         progress = None
         try:
             if self.ai_service is not None:
-                progress = await self._progress(update)
+                progress = await self._progress(update, "⏳ Ищу ответ в документе…")
             response = self.questions.ask(self._user_id(update), question)
         except QuestionError as exc:
             await self._reply(update, str(exc))
@@ -155,14 +155,14 @@ class TelegramHandlers:
                     await message.reply_text(chunk)
 
     @staticmethod
-    async def _progress(update):
+    async def _progress(update, text):
         message = getattr(update, "message", None)
         if message is None:
             return None
         try:
-            return await message.reply_text("⏳ Анализирую документ…", parse_mode="HTML")
+            return await message.reply_text(text, parse_mode="HTML")
         except TypeError:
-            return await message.reply_text("⏳ Анализирую документ…")
+            return await message.reply_text(text)
 
     @staticmethod
     async def _delete_message(message) -> None:

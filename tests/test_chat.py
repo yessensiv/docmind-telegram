@@ -14,7 +14,7 @@ class FakeResponses:
 
     def create(self, **kwargs):
         self.calls.append(kwargs)
-        return SimpleNamespace(output_text="chat answer")
+        return SimpleNamespace(output_text="**Elden Ring** — action RPG")
 
 
 class FakeMessage:
@@ -45,7 +45,8 @@ def test_chat_without_text_shows_hint():
     config = load_config({"DEMO_MODE": "true"}, dotenv_path=None)
     update = FakeUpdate("/chat")
     asyncio.run(TelegramHandlers(AssistantHandlers(config)).chat(update, None))
-    assert "Использование: /chat" in update.message.replies[0]
+    assert "Использование:" in update.message.replies[0]
+    assert "<code>/chat" in update.message.replies[0]
 
 
 def test_demo_chat_does_not_call_openai():
@@ -62,7 +63,8 @@ def test_production_chat_uses_policy_and_prompt_without_document_context():
     service = OpenAIService(config, client=client)
     update = FakeUpdate("/chat объясни задачу")
     asyncio.run(TelegramHandlers(None, ai_service=service).chat(update, None))
-    assert "chat answer" in update.message.replies
+    assert update.message.replies[0] == "⏳ Обрабатываю запрос…"
+    assert "<b>Elden Ring</b> — action RPG" in update.message.replies[1]
     assert client.responses.calls[0]["model"] == Model.LUNA.value
     assert "объясни задачу" in client.responses.calls[0]["input"]
     assert "КОНТЕКСТ ДОКУМЕНТА" not in client.responses.calls[0]["input"]

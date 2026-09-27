@@ -9,7 +9,19 @@ TELEGRAM_MESSAGE_LIMIT = 4096
 def format_html(text: str) -> str:
     lines = []
     for raw_line in text.splitlines():
-        line = escape(raw_line, quote=False)
+        preserved: dict[str, str] = {}
+
+        def preserve_tag(match: re.Match[str]) -> str:
+            token = f"\x00TAG{len(preserved)}\x00"
+            preserved[token] = match.group(0)
+            return token
+
+        # Keep only Telegram-safe tags that may already be present in generated text.
+        line = re.sub(r"</?(?:b|i|code)>", preserve_tag, raw_line, flags=re.IGNORECASE)
+        line = escape(line, quote=False)
+        line = re.sub(r"`([^`\n]+)`", r"<code>\1</code>", line)
+        line = re.sub(r"\*\*([^*\n]+)\*\*", r"<b>\1</b>", line)
+        line = re.sub(r"(?<!\*)\*([^*\n]+)\*(?!\*)", r"<i>\1</i>", line)
         for heading, emoji in (
             ("КРАТКОЕ РЕЗЮМЕ:", "📝"),
             ("КЛЮЧЕВЫЕ ПУНКТЫ:", "🔹"),
@@ -21,9 +33,11 @@ def format_html(text: str) -> str:
                 break
         if line.endswith(":") and not line.startswith(("•", "-", "*")):
             line = f"<b>{line}</b>"
-        line = re.sub(r"(?<!\w)(/(?:start|help|ask|clear|status)(?:\s+[^\s]+)?)", r"<code>\1</code>", line)
+        line = re.sub(r"(?<!\w)(/(?:start|help|ask|chat|clear|status)(?:\s+[^\s]+)?)", r"<code>\1</code>", line)
         if line.startswith(("- ", "* ")):
             line = "• " + line[2:]
+        for token, tag in preserved.items():
+            line = line.replace(token, tag)
         lines.append(line)
     return "\n".join(lines)
 
