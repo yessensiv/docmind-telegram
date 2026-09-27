@@ -56,10 +56,10 @@ def test_production_text_handler_uses_mock_openai_service():
     service = OpenAIService(config, client=client)
     update = FakeUpdate(text="hello")
     run(TelegramHandlers(None, ai_service=service).text(update, None))
-    assert ("⏳ Анализирую документ…", None) in update.message.replies
-    assert ("mocked production answer", None) in update.message.replies
-    assert update.message.sent_messages[0].deleted is True
-    assert client.responses.calls[0]["model"] == Model.LUNA.value
+    assert len(update.message.replies) == 1
+    assert "Загрузите TXT-файл" in update.message.replies[0][0]
+    assert "<code>/ask ваш</code> вопрос" in update.message.replies[0][0]
+    assert client.responses.calls == []
 
 
 def test_production_document_handler_uses_mock_openai_service():

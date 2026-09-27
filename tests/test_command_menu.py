@@ -21,5 +21,6 @@ def test_register_commands_sets_russian_menu_without_secrets():
     bot = FakeBot()
     asyncio.run(register_commands(bot, FakeCommand))
     assert [(item.command, item.description) for item in bot.commands] == list(COMMAND_MENU)
+    assert ("chat", "Общаться с ИИ без документа") in list(COMMAND_MENU)
     assert all("TOKEN" not in item.description.upper() for item in bot.commands)
     assert all("KEY" not in item.description.upper() for item in bot.commands)

@@ -43,7 +43,8 @@ def test_start_and_help_handlers(telegram_handlers):
 def test_text_handler_returns_demo_reply(telegram_handlers):
     update = FakeUpdate("Привет")
     run(telegram_handlers.text(update, None))
-    assert "Демо-ответ" in update.message.replies[0]
+    assert "Загрузите TXT-файл" in update.message.replies[0]
+    assert "<code>/ask ваш</code> вопрос" in update.message.replies[0]
 
 
 def test_text_handler_converts_length_error(telegram_handlers):

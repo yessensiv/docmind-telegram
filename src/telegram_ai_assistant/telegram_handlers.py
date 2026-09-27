@@ -13,7 +13,7 @@ from .html_formatter import format_html, split_html
 from .budget import InMemoryBudget
 from .status_service import StatusService
 from .suggested_questions import generate_questions
-from .demo_responses import HELP_RESPONSE, START_RESPONSE
+from .demo_responses import CHAT_HINT, HELP_RESPONSE, START_RESPONSE, demo_reply
 from .models import Command
 from orchestrator.models import TaskKind
 
@@ -37,25 +37,36 @@ class TelegramHandlers:
         await self._reply(update, HELP_RESPONSE)
 
     async def text(self, update, context) -> None:
-        message = getattr(update, "message", None)
-        incoming_text = getattr(message, "text", None)
+        incoming_text = getattr(getattr(update, "message", None), "text", None) or ""
+        config = self.handlers.config if self.handlers is not None else self.ai_service.config
+        if len(incoming_text) > config.max_message_length:
+            await self._reply(update, "Сообщение слишком длинное. Сократите его и попробуйте снова.")
+            return
+        await self._reply(update, "Загрузите TXT-файл или используйте /ask ваш вопрос")
+
+    async def chat(self, update, context) -> None:
+        raw = getattr(getattr(update, "message", None), "text", "") or ""
+        parts = raw.split(maxsplit=1)
+        prompt = parts[1].strip() if len(parts) == 2 else ""
+        if not prompt:
+            await self._reply(update, CHAT_HINT)
+            return
         progress = None
         try:
             if self.ai_service is None:
-                response = self.handlers.handle(incoming_text)
+                response = demo_reply(prompt).text
             else:
                 progress = await self._progress(update)
-                response = self.ai_service.complete(self._user_id(update), incoming_text or "", TaskKind.SIMPLE)
-                response = response.text
+                response = self.ai_service.complete(self._user_id(update), prompt, TaskKind.CHAT).text
         except MessageTooLongError:
             await self._reply(update, "Сообщение слишком длинное. Сократите его и попробуйте снова.")
             return
         except Exception:
-            self.logger.exception("Unhandled local assistant error")
-            await self._reply(update, "Не удалось обработать сообщение. Попробуйте позже.")
+            self.logger.exception("Unhandled chat error")
+            await self._reply(update, "Не удалось обработать запрос. Попробуйте позже.")
             return
         await self._delete_message(progress)
-        await self._reply(update, response if isinstance(response, str) else response.text)
+        await self._reply(update, response)
 
     async def document(self, update, context) -> None:
         document = getattr(getattr(update, "message", None), "document", None)

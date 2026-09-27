@@ -18,6 +18,7 @@ class TaskKind(str, Enum):
     TESTS = "tests"
     DOCUMENTATION = "documentation"
     TEMPLATE = "template"
+    CHAT = "chat"
 
 
 @dataclass(frozen=True)

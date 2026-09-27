@@ -7,6 +7,7 @@ from .telegram_handlers import TelegramHandlers
 COMMAND_MENU = (
     ("start", "Запустить ассистента"),
     ("help", "Показать справку"),
+    ("chat", "Общаться с ИИ без документа"),
     ("ask", "Задать вопрос по TXT-документу"),
     ("clear", "Удалить свой документ"),
     ("status", "Показать безопасный статус"),
@@ -43,6 +44,7 @@ def create_application(config: AssistantConfig, handlers: AssistantHandlers | No
     application = Application.builder().token(config.telegram_bot_token).post_init(post_init).build()
     application.add_handler(CommandHandler("start", telegram_handlers.start))
     application.add_handler(CommandHandler("help", telegram_handlers.help))
+    application.add_handler(CommandHandler("chat", telegram_handlers.chat))
     application.add_handler(CommandHandler("ask", telegram_handlers.ask))
     application.add_handler(CommandHandler("clear", telegram_handlers.clear))
     application.add_handler(CommandHandler("status", telegram_handlers.status))
