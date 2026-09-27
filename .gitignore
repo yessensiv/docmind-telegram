@@ -1,0 +1,16 @@
+.env
+!.env.example
+work/
+outputs/
+__pycache__/
+.pytest_cache/
+*.pyc
+.venv/
+venv/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+.mypy_cache/
+.ruff_cache/

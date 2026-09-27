@@ -1,0 +1,20 @@
+[build-system]
+requires = []
+build-backend = "setuptools.build_meta:__legacy__"
+
+[project]
+name = "model-orchestrator"
+version = "0.1.0"
+description = "Offline task router for Astra, Sol and Luna"
+requires-python = ">=3.10"
+dependencies = [
+    "python-telegram-bot",
+    "openai",
+]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

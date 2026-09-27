@@ -1,0 +1,5 @@
+"""Limits for the local TXT analyzer."""
+
+MAX_DOCUMENT_BYTES = 1_000_000
+MAX_DOCUMENT_CHARACTERS = 20_000
+PREVIEW_LINES = 3
